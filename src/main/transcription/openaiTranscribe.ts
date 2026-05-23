@@ -16,12 +16,13 @@ const BASE_PROMPT = `
 The speaker mixes Mongolian and English in everyday dictation.
 Transcribe exactly what is spoken.
 Write Mongolian words in Mongolian Cyrillic.
-Write ALL foreign-origin words in Latin letters — never transliterate them into Cyrillic.
-This includes English loanwords used in daily Mongolian speech: meeting, presentation, project, deadline, design, modern, email, assignment, idea, class, laptop, song, vibe, style, plan, app, file, group, option, budget, busy, stress, creative, premium, schedule, unique, link, phone, content, version, team, teamwork, coffee, etc.
+Write code-switched English words, brand names, product names, app names, and programming terms in Latin letters — never transliterate those into Cyrillic.
+This includes English words used in daily Mongolian speech: meeting, presentation, project, deadline, design, modern, email, assignment, idea, class, laptop, song, vibe, style, plan, app, file, group, option, budget, busy, stress, creative, premium, schedule, unique, link, phone, content, version, team, teamwork, etc.
 Also includes brand names, app names, product names, and programming terms.
 Preserve Mongolian case/possessive suffixes attached to foreign words using a hyphen:
 "meeting-д", "presentation-аа", "email-ээ", "deadline-аасаа", "laptop-оо", "link-ийг", "budget-ээ".
 Never write a foreign word + Mongolian suffix as a single Cyrillic blob (e.g. NOT "митингд", "презентэйшнээ", "имэйлээ").
+Do not force established Mongolian loanwords into English spelling when they are spoken as Mongolian words, such as кофе, интернет, компьютер, банк, менежмент.
 Do not translate. Do not invent words.
 
 Common foreign terms:
@@ -31,7 +32,7 @@ Whisper Flow, Wispr Flow, Chimege, OpenAI, ChatGPT, Claude Code,
 meeting, presentation, project, deadline, design, modern, email,
 assignment, idea, class, laptop, song, vibe, style, plan, app, file,
 group, option, budget, busy, stress, creative, premium, schedule,
-unique, link, phone, content, version, team, teamwork, coffee.
+unique, link, phone, content, version, team, teamwork.
 `.trim()
 
 /**

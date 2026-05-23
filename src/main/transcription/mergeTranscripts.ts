@@ -14,16 +14,19 @@ Merge two transcripts into one accurate final transcript.
 
 Inputs:
 1. Chimege transcript: better for Mongolian Cyrillic structure. IMPORTANT: Chimege ALWAYS transliterates foreign words into Cyrillic (e.g. "meeting" → "митинг", "presentation" → "презентэйшн", "email" → "имэйл", "React" → "реакт", "deadline" → "дэдлайн", "laptop" → "лаптоп", "phone" → "фоон", "schedule" → "шедүүл"). These MUST be replaced with the Latin form.
-2. OpenAI transcript: better for foreign words in Latin letters. May be empty.
+2. OpenAI transcript: better for detecting foreign words and their Latin spelling. May be empty. Use it as a foreign-term hint, not as the Mongolian sentence source.
 3. Custom glossary: preferred spellings — always honor these.
 
 Hard rules (most important):
 - The final transcript MUST contain foreign words (English, brand names, product names, app names, programming terms, modern loanwords) in their ORIGINAL LATIN form, not Cyrillic.
 - Take the Mongolian sentence skeleton from Chimege, but for every foreign-origin word, replace the Cyrillic-ified version with the Latin form from the OpenAI transcript.
-- If OpenAI is empty but Chimege contains an obvious Cyrillic-ified foreign word (meeting, presentation, project, deadline, design, modern, email, assignment, idea, class, laptop, song, vibe, style, plan, app, file, group, option, budget, busy, stress, creative, premium, schedule, unique, link, phone, content, version, team, teamwork, coffee, etc.), restore it to its standard Latin spelling. Use the glossary first, then standard English spelling.
+- If OpenAI is empty but Chimege contains an obvious Cyrillic-ified foreign word (meeting, presentation, project, deadline, design, modern, email, assignment, idea, class, laptop, song, vibe, style, plan, app, file, group, option, budget, busy, stress, creative, premium, schedule, unique, link, phone, content, version, team, teamwork, etc.), restore it to its standard Latin spelling. Use the glossary first, then standard English spelling.
 - Preserve Mongolian case/possessive suffixes attached to foreign words using a hyphen: "meeting-д", "presentation-аа", "email-ээ", "deadline-аасаа", "assignment-аа", "laptop-оо", "plan-аа", "file-аа", "budget-ээ", "link-ийг", "final version-оо". Never write these as one Cyrillic blob.
 - Keep genuine Mongolian words in Mongolian Cyrillic. Do not Latinize Mongolian words.
 - Do not translate. Do not rewrite into formal writing. Do not add information.
+- Never replace normal Mongolian words from the Chimege skeleton with English-looking words unless that English word is present in the custom glossary or is a known foreign/tech/brand term listed in the examples.
+- Especially do not turn "буруу" into "bro"; keep "буруу" as Mongolian.
+- Do not force established Mongolian loanwords into English spelling unless the glossary or OpenAI transcript clearly indicates code-switching. Keep words like "кофе", "интернет", "компьютер", "банк", "менежмент" in Cyrillic when they are used as Mongolian words.
 
 Cleanup rules:
 - Remove filler sounds and hesitation tokens such as: "а", "аа", "ээ", "мм", "амм", "нөгөө" when they do not add meaning.
@@ -38,7 +41,6 @@ Examples (Chimege → final):
 - "Маргааш презентэйшнээ бэлдэх хэрэгтэй" → "Маргааш presentation-аа бэлдэх хэрэгтэй"
 - "Энэ прожект их гоё санаатай байна" → "Энэ project их гоё санаатай байна"
 - "Чи дэдлайнаасаа өмнө дуусгаарай" → "Чи deadline-аасаа өмнө дуусгаарай"
-- "Би кофе уугаад хичээлдээ явна" → "Би coffee уугаад хичээлдээ явна"
 - "Манай багийн тимворк сайн байсан" → "Манай багийн teamwork сайн байсан"
 - "Энэ дизайн арай илүү модерн харагдаж байна" → "Энэ design арай илүү modern харагдаж байна"
 - "Чи имэйлээ шалгасан уу" → "Чи email-ээ шалгасан уу"

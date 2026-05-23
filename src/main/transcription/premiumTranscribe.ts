@@ -1,6 +1,11 @@
 import { transcribe as transcribeWithChimege } from './chimege'
 import { transcribeWithOpenAI, type OpenAiAudioModel } from './openaiTranscribe'
 import { mergeTranscripts } from './mergeTranscripts'
+import {
+  DEFAULT_FOREIGN_GLOSSARY,
+  normalizeForeignWords,
+  protectTranscriptSkeleton
+} from './foreignWordNormalizer'
 import { isDev } from '../dev'
 
 /** Үндсэн глоссари — нэр томьёо, бренд, программчлалын үгс. */
@@ -25,7 +30,8 @@ const DEFAULT_GLOSSARY = [
   'Chimege',
   'OpenAI',
   'ChatGPT',
-  'Claude Code'
+  'Claude Code',
+  ...DEFAULT_FOREIGN_GLOSSARY
 ]
 
 /** premiumTranscribe-ийн үр дүн — debug талбаруудтай. */
@@ -50,7 +56,7 @@ export async function premiumTranscribe(
   customVocab: string[] = [],
   signal?: AbortSignal
 ): Promise<TranscriptionResult> {
-  const glossary = [...DEFAULT_GLOSSARY, ...customVocab]
+  const glossary = [...new Set([...DEFAULT_GLOSSARY, ...customVocab])]
 
   // Хоёр хөдөлгүүрийг зэрэг ажиллуулна (Promise.allSettled — аль нь ч унаж болно).
   const [chimegeRes, openaiRes] = await Promise.allSettled([
@@ -60,6 +66,14 @@ export async function premiumTranscribe(
 
   const chimegeText = chimegeRes.status === 'fulfilled' ? chimegeRes.value.trim() : ''
   const openaiText = openaiRes.status === 'fulfilled' ? openaiRes.value.trim() : ''
+  const normalizedChimegeText = normalizeForeignWords(chimegeText, {
+    glossary: customVocab,
+    openaiText
+  }).trim()
+  const normalizedOpenaiText = normalizeForeignWords(openaiText, {
+    glossary: customVocab,
+    openaiText
+  }).trim()
 
   if (isDev()) {
     if (chimegeRes.status === 'rejected') console.warn('[premium] Chimege алдаа:', chimegeRes.reason)
@@ -75,17 +89,39 @@ export async function premiumTranscribe(
 
   // Зөвхөн OpenAI амжилттай — шууд буцаана (нэгтгэх юм байхгүй).
   if (!chimegeText) {
-    return result('openai-fallback', chimegeText, openaiText, openaiText)
+    return result('openai-fallback', chimegeText, openaiText, normalizedOpenaiText)
   }
 
-  // Зөвхөн Chimege амжилттай — merge-ээр зөвхөн цэвэрлэнэ (filler устгах).
+  // Зөвхөн Chimege амжилттай — deterministic normalizer + merge cleanup.
   if (!openaiText) {
-    const finalText = await safeMerge(chimegeText, '', glossary, chimegeText, signal)
+    const merged = await safeMerge(
+      normalizedChimegeText,
+      '',
+      glossary,
+      normalizedChimegeText,
+      signal
+    )
+    const normalized = normalizeForeignWords(merged, { glossary: customVocab })
+    const finalText = protectTranscriptSkeleton(normalized, chimegeText, { glossary: customVocab })
     return result('chimege-correction-fallback', chimegeText, openaiText, finalText)
   }
 
-  // Хоёулаа амжилттай — бүрэн нэгтгэлт.
-  const finalText = await safeMerge(chimegeText, openaiText, glossary, openaiText, signal)
+  // Хоёулаа амжилттай — Chimege skeleton-г хадгалж, OpenAI-г foreign-term hint болгоно.
+  const merged = await safeMerge(
+    normalizedChimegeText,
+    normalizedOpenaiText,
+    glossary,
+    normalizedChimegeText,
+    signal
+  )
+  const normalized = normalizeForeignWords(merged, {
+    glossary: customVocab,
+    openaiText: normalizedOpenaiText
+  })
+  const finalText = protectTranscriptSkeleton(normalized, chimegeText, {
+    glossary: customVocab,
+    openaiText: normalizedOpenaiText
+  })
   return result('premium-mixed', chimegeText, openaiText, finalText)
 }
 

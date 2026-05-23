@@ -134,6 +134,15 @@ function toggleOverlay(): void {
   }
 }
 
+function credentialsReady(): boolean {
+  const mode = getSettings().transcriptionMode
+  return mode === 'fast' ? hasToken() : hasToken() && hasOpenaiKey()
+}
+
+function showMainEntry(): void {
+  if (!credentialsReady()) createSettingsWindow()
+}
+
 function applyHotkey(): void {
   const { hotkey } = getSettings()
   hotkeyOk = registerHotkey(hotkey, () => toggleOverlay())
@@ -226,8 +235,7 @@ app.whenReady().then(() => {
   // Сонгосон горимын нэвтрэлт дутуу/хүчингүй бол тохиргооны цонх нээнэ.
   // fast → зөвхөн Chimege token; premium/high → Chimege token + OpenAI key.
   const mode = getSettings().transcriptionMode
-  const hasCreds = mode === 'fast' ? hasToken() : hasToken() && hasOpenaiKey()
-  if (!hasCreds) {
+  if (!credentialsReady()) {
     setTimeout(() => createSettingsWindow(), 500)
   } else {
     setTimeout(() => {
@@ -239,7 +247,7 @@ app.whenReady().then(() => {
   }
 })
 
-app.on('second-instance', () => createSettingsWindow())
+app.on('second-instance', () => showMainEntry())
 
 // Tray апп — бүх цонх хаагдсан ч ажилласаар байна.
 app.on('window-all-closed', () => {

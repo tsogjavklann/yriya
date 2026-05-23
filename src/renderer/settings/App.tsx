@@ -1,5 +1,6 @@
 import { type CSSProperties, type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import type { InjectMode, Settings, TranscriptionMode } from '../../shared/types'
+import logoUrl from '../../../resources/icon.png'
 
 /* ---------- SVG icon-ууд ---------- */
 const ICONS: Record<string, ReactNode> = {
@@ -328,12 +329,7 @@ export default function App(): JSX.Element {
     <div className="app">
       <header className="hero">
         <div className="logo">
-          <span className="logo-bars">
-            <i />
-            <i />
-            <i />
-            <i />
-          </span>
+          <img src={logoUrl} alt="Yriya" className="logo-img" />
         </div>
         <div className="hero-text">
           <h1>Yriya</h1>

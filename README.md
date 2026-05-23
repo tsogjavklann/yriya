@@ -26,7 +26,6 @@ hotkey → микрофон → VAD (өгүүлбэр таслах) → WAV → 
 
 ```bash
 npm install
-node scripts/gen-icons.cjs   # resources/icon.png үүсгэнэ (анх удаа)
 ```
 
 ## Ажиллуулах (хөгжүүлэлт)
