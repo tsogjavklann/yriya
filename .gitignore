@@ -1,0 +1,19 @@
+node_modules/
+out/
+dist/
+*.log
+.DS_Store
+
+# Environment & secrets
+.env
+.env.*
+*.pem
+*.key
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+
+# Local tool output
+.playwright-mcp/

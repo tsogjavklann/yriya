@@ -1,0 +1,37 @@
+appId: mn.yriya.app
+productName: Yriya
+copyright: Copyright © 2026 Yriya
+directories:
+  buildResources: build
+  output: dist
+files:
+  - '!**/.vscode/*'
+  - '!src/*'
+  - '!scripts/*'
+  - '!electron.vite.config.{js,ts,mjs,cjs}'
+  - '!{.gitignore,.npmrc}'
+  - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+asarUnpack:
+  - resources/**
+  - '**/*.node'
+  - '**/node_modules/@nut-tree-fork/**'
+extraResources:
+  - from: resources
+    to: resources
+win:
+  target:
+    - nsis
+    - portable
+  icon: resources/icon.png
+  executableName: Yriya
+  artifactName: ${productName}-${version}-${arch}.${ext}
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  shortcutName: Yriya
+  deleteAppDataOnUninstall: false
+portable:
+  artifactName: ${productName}-${version}-portable.${ext}
+# Code signing: сертификат байвал CSC_LINK (.pfx зам) ба CSC_KEY_PASSWORD
+# орчны хувьсагчийг тохируулна. Тохируулаагүй бол гарын үсэггүй build гарна.
